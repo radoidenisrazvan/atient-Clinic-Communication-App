@@ -1,7 +1,9 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const cors = require("cors");
-require("dotenv").config();
+const dotenv = require("dotenv");
+const connectDB = require("./config/db"); // Importă funcția de conectare la MongoDB
+const authRoutes = require("./routes/authRoutes");
+dotenv.config(); // Încarcă variabilele din fișierul .env
 
 const app = express();
 
@@ -9,17 +11,19 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// Test route
+//Rute
+app.use("/api/auth", authRoutes);
+
+// Rute de test
 app.get("/", (req, res) => {
   res.send("Server is running...");
 });
 
-// Connect to MongoDB
+// Conectare la MongoDB și pornire server
 const PORT = process.env.PORT || 5000;
-mongoose
-  .connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => {
-    console.log("Connected to MongoDB");
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-  })
-  .catch((err) => console.error(err));
+
+connectDB(); // Conectează la baza de date
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
