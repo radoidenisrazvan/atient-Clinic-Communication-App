@@ -289,7 +289,7 @@ Acest document oferă pașii detaliați pentru configurarea și rularea proiectu
         "name": "John Doe",
         "email": "johndoe@example.com",
         "password": "password123"
-        }```
+        }
     - verifica raspunsul primit si ca utilizatorul a fost salvat in baza de date.
 2. Login user:
     - Creează o cerere POST pentru ruta http://localhost:5000/api/auth/login.
@@ -298,7 +298,7 @@ Acest document oferă pașii detaliați pentru configurarea și rularea proiectu
         {
         "email": "johndoe@example.com",
         "password": "password123"
-        }```
+        }
     - Verifică răspunsul primit și token-ul generat.
 
 
