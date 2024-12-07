@@ -301,6 +301,11 @@ Acest document oferă pașii detaliați pentru configurarea și rularea proiectu
         }
     - Verifică răspunsul primit și token-ul generat.
 
+## Probleme intampinate fix..:
+
+1. Server deja in folosire:
+    ```bash
+    npx kill-port 5000 (port-ul respectiv)
 
 
 
