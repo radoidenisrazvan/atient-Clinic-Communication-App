@@ -1,13 +1,17 @@
 import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 
-const LoginScreen = ({ route, navigation }) => {
-  const { userType } = route.params; // Patient or Doctor
+const RegisterScreen = ({ route }) => {
+    const userType = route.params?.userType || 'User'; // Default to 'User' if undefined
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Login as {userType}</Text>
+      <Text style={styles.title}>Register as {userType}</Text>
       
+      <TextInput 
+        style={styles.input} 
+        placeholder="Full Name" 
+      />
       <TextInput 
         style={styles.input} 
         placeholder="Email" 
@@ -18,20 +22,15 @@ const LoginScreen = ({ route, navigation }) => {
         placeholder="Password" 
         secureTextEntry 
       />
+      <TextInput 
+        style={styles.input} 
+        placeholder="Confirm Password" 
+        secureTextEntry 
+      />
 
       <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Login</Text>
+        <Text style={styles.buttonText}>Sign Up</Text>
       </TouchableOpacity>
-      
-      <TouchableOpacity
-        style={styles.link}
-        onPress={() => navigation.navigate('Register', { userType })}
-        >
-        <Text style={styles.linkText}>
-            Don't have an account? Sign up as {userType}.
-        </Text>
-        </TouchableOpacity>
-
     </View>
   );
 };
@@ -70,13 +69,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
   },
-  link: {
-    marginTop: 20,
-  },
-  linkText: {
-    color: '#007bff',
-    fontSize: 16,
-  },
 });
 
-export default LoginScreen;
+export default RegisterScreen;
