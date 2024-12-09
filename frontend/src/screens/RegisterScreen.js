@@ -1,36 +1,30 @@
 import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { ScrollView, Text, TouchableOpacity, StyleSheet, View } from 'react-native';
+import RegisterPatientForm from './register/RegisterPatientForm';
+import RegisterDoctorForm from './register/RegisterDoctorForm';
 
 const RegisterScreen = ({ route }) => {
-    const userType = route.params?.userType || 'User'; // Default to 'User' if undefined
+  const { userType } = route.params || { userType: 'Patient' };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Register as {userType}</Text>
-      
-      <TextInput 
-        style={styles.input} 
-        placeholder="Full Name" 
-      />
-      <TextInput 
-        style={styles.input} 
-        placeholder="Email" 
-        keyboardType="email-address" 
-      />
-      <TextInput 
-        style={styles.input} 
-        placeholder="Password" 
-        secureTextEntry 
-      />
-      <TextInput 
-        style={styles.input} 
-        placeholder="Confirm Password" 
-        secureTextEntry 
-      />
+      <ScrollView 
+        style={styles.scrollContainer} 
+        contentContainerStyle={styles.contentContainer} 
+        keyboardShouldPersistTaps="handled"
+      >
+        <Text style={styles.title}>Register as {userType}</Text>
+        
+        {userType === 'Patient' && <RegisterPatientForm />}
+        {userType === 'Doctor' && <RegisterDoctorForm />}
+      </ScrollView>
 
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Sign Up</Text>
-      </TouchableOpacity>
+      {/* Fixed Register Button */}
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.button}>
+          <Text style={styles.buttonText}>Register</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -38,36 +32,37 @@ const RegisterScreen = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
     backgroundColor: '#f5f5f5',
+  },
+  scrollContainer: {
+    flex: 1,
+  },
+  contentContainer: {
     padding: 20,
+    paddingBottom: 80, // Spațiu suplimentar pentru a evita suprapunerea cu butonul
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 20,
+    textAlign: 'center',
   },
-  input: {
-    width: '80%',
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    marginBottom: 15,
+  buttonContainer: {
+    padding: 20,
+    backgroundColor: '#f5f5f5',
+    borderTopWidth: 1,
+    borderTopColor: '#ddd',
   },
   button: {
     backgroundColor: '#007bff',
     padding: 15,
     borderRadius: 8,
-    width: '80%',
     alignItems: 'center',
   },
   buttonText: {
     color: '#fff',
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: 'bold',
   },
 });
 
