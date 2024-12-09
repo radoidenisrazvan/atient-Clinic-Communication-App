@@ -306,6 +306,8 @@ Acest document oferă pașii detaliați pentru configurarea și rularea proiectu
 1. Server deja in folosire:
     ```bash
     npx kill-port 5000 (port-ul respectiv)
+2. Nu se trimit datele din frontend in baza de date?:
+    verifica in frontend/src/config/api.js daca contine ip-ul tau local (terminal-> ipconfig -> primul ipv4); 
 
 
 

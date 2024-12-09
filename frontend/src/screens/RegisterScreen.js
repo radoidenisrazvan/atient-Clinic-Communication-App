@@ -3,7 +3,7 @@ import { ScrollView, Text, TouchableOpacity, StyleSheet, View } from 'react-nati
 import RegisterPatientForm from './register/RegisterPatientForm';
 import RegisterDoctorForm from './register/RegisterDoctorForm';
 
-const RegisterScreen = ({ route }) => {
+const RegisterScreen = ({ route, navigation }) => {
   const { userType } = route.params || { userType: 'Patient' };
 
   return (
@@ -15,16 +15,10 @@ const RegisterScreen = ({ route }) => {
       >
         <Text style={styles.title}>Register as {userType}</Text>
         
-        {userType === 'Patient' && <RegisterPatientForm />}
-        {userType === 'Doctor' && <RegisterDoctorForm />}
+        {userType === 'Patient' && <RegisterPatientForm navigation={navigation} />}
+        {userType === 'Doctor' && <RegisterDoctorForm navigation={navigation} />}
       </ScrollView>
-
-      {/* Fixed Register Button */}
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Register</Text>
-        </TouchableOpacity>
-      </View>
+      
     </View>
   );
 };

@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 
+
 const patientSchema = mongoose.Schema(
   {
     role: {
@@ -8,7 +9,11 @@ const patientSchema = mongoose.Schema(
     },
     name: {
       type: String,
-      required: true,
+      required: true, // Numele
+    },
+    surname: {
+      type: String,
+      required: true, // Prenumele
     },
     email: {
       type: String,

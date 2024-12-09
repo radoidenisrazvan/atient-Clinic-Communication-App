@@ -11,13 +11,14 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-//Rute
+//Rute 
 app.use("/api/auth", authRoutes);
 
 // Rute de test
 app.get("/", (req, res) => {
   res.send("Server is running...");
 });
+
 
 // Conectare la MongoDB și pornire server
 const PORT = process.env.PORT || 5000;

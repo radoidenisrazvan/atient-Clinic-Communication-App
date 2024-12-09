@@ -6,11 +6,27 @@ const bcrypt = require("bcryptjs");
 
 const router = express.Router();
 
+// Middleware pentru validarea datelor de înregistrare
+const validateRegisterData = (req, res, next) => {
+  const { role, name, email, password } = req.body;
+
+  if (!role || !["doctor", "patient"].includes(role)) {
+    return res.status(400).json({ message: "Invalid or missing role." });
+  }
+
+  if (!name || !email || !password) {
+    return res.status(400).json({ message: "Name, email, and password are required." });
+  }
+
+  next();
+};
+
 // Înregistrare utilizator
-router.post("/register", async (req, res) => {
+router.post("/register", validateRegisterData, async (req, res) => {
   const {
     role,
     name,
+    surname,
     email,
     password,
     phone,
@@ -32,7 +48,7 @@ router.post("/register", async (req, res) => {
         : await Patient.findOne({ email });
 
     if (existingUser) {
-      return res.status(400).json({ message: "User already exists" });
+      return res.status(400).json({ message: "User already exists." });
     }
 
     // Hash-uiește parola
@@ -42,6 +58,7 @@ router.post("/register", async (req, res) => {
     if (role === "doctor") {
       user = new Doctor({
         name,
+        surname,
         email,
         password: hashedPassword,
         phone,
@@ -52,6 +69,7 @@ router.post("/register", async (req, res) => {
     } else if (role === "patient") {
       user = new Patient({
         name,
+        surname,
         email,
         password: hashedPassword,
         phone,
@@ -66,25 +84,34 @@ router.post("/register", async (req, res) => {
     await user.save();
 
     // Generează token JWT
-    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
+    const token = jwt.sign(
+      { id: user._id, role: role },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
 
     res.status(201).json({
+      message: "User registered successfully.", // Mesajul de succes
       id: user._id,
-      role: user.role,
+      role,
       name: user.name,
       email: user.email,
       token,
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Error in /register:", error.message);
+    res.status(500).json({ message: "Server error during registration." });
   }
 });
+
 
 // Logare utilizator
 router.post("/login", async (req, res) => {
   const { email, password, role } = req.body;
+
+  if (!email || !password || !role) {
+    return res.status(400).json({ message: "Email, password, and role are required." });
+  }
 
   try {
     // Caută utilizatorul în colecția corespunzătoare
@@ -93,24 +120,33 @@ router.post("/login", async (req, res) => {
         ? await Doctor.findOne({ email })
         : await Patient.findOne({ email });
 
-    if (!user || !(await bcrypt.compare(password, user.password))) {
-      return res.status(401).json({ message: "Invalid email or password" });
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    // Verifică parola
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: "Invalid email or password." });
     }
 
     // Generează token JWT
-    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
+    const token = jwt.sign(
+      { id: user._id, role: role },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
 
     res.status(200).json({
       id: user._id,
-      role: user.role,
+      role,
       name: user.name,
       email: user.email,
       token,
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Error in /login:", error.message);
+    res.status(500).json({ message: "Server error during login." });
   }
 });
 

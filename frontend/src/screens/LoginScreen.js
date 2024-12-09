@@ -2,7 +2,8 @@ import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 
 const LoginScreen = ({ route, navigation }) => {
-  const { userType } = route.params; // Patient or Doctor
+  // Folosește un fallback dacă `route.params` sau `route.params.userType` sunt undefined
+  const userType = route?.params?.userType || 'User'; // Default: 'User'
 
   return (
     <View style={styles.container}>
@@ -30,8 +31,7 @@ const LoginScreen = ({ route, navigation }) => {
         <Text style={styles.linkText}>
             Don't have an account? Sign up as {userType}.
         </Text>
-        </TouchableOpacity>
-
+      </TouchableOpacity>
     </View>
   );
 };
