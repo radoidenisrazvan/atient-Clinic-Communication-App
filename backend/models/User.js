@@ -3,6 +3,11 @@ const bcrypt = require("bcryptjs");
 
 const userSchema = mongoose.Schema(
   {
+    role: {
+      type: String,
+      enum: ["doctor", "patient"], // Tipuri de utilizatori permise
+      required: true,
+    },
     name: {
       type: String,
       required: true,
@@ -15,6 +20,60 @@ const userSchema = mongoose.Schema(
     password: {
       type: String,
       required: true,
+    },
+    phone: {
+      type: String,
+      required: true,
+    },
+    // Specific pentru doctori
+    professionalGrade: {
+      type: String,
+      required: function () {
+        return this.role === "doctor";
+      },
+    },
+    speciality: {
+      type: String,
+      required: function () {
+        return this.role === "doctor";
+      },
+    },
+    workSchedule: {
+      type: String,
+      required: function () {
+        return this.role === "doctor";
+      },
+    },
+    // Specific pentru pacienți
+    address: {
+      type: String,
+      required: function () {
+        return this.role === "patient";
+      },
+    },
+    birthDate: {
+      type: Date,
+      required: function () {
+        return this.role === "patient";
+      },
+    },
+    bloodType: {
+      type: String,
+      required: function () {
+        return this.role === "patient";
+      },
+    },
+    weight: {
+      type: Number,
+      required: function () {
+        return this.role === "patient";
+      },
+    },
+    height: {
+      type: Number,
+      required: function () {
+        return this.role === "patient";
+      },
     },
   },
   {
