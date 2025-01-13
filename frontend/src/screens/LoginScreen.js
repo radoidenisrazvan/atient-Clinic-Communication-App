@@ -1,35 +1,73 @@
-import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { API_BASE_URL } from '../config/api'; 
 
 const LoginScreen = ({ route, navigation }) => {
-  // Folosește un fallback dacă `route.params` sau `route.params.userType` sunt undefined
-  const userType = route?.params?.userType || 'User'; // Default: 'User'
+  const userType = route?.params?.userType || 'User';
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert('Error', 'Please fill in all fields');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password, role: userType.toLowerCase() }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        Alert.alert('Error', data.message || 'Login failed. Please try again.');
+        return;
+      }
+
+      // Navighează către Home dacă autentificarea a avut succes
+      Alert.alert('Success', 'Login successful!');
+      navigation.navigate('Home', { userType: userType, name: data.name });
+    } catch (error) {
+      console.error('Login error:', error);
+      Alert.alert('Error', 'Unable to connect to the server. Please try again later.');
+    }
+  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Login as {userType}</Text>
       
-      <TextInput 
-        style={styles.input} 
-        placeholder="Email" 
-        keyboardType="email-address" 
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        keyboardType="email-address"
+        value={email}
+        onChangeText={setEmail}
       />
-      <TextInput 
-        style={styles.input} 
-        placeholder="Password" 
-        secureTextEntry 
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        secureTextEntry
+        value={password}
+        onChangeText={setPassword}
       />
 
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
       
       <TouchableOpacity
         style={styles.link}
         onPress={() => navigation.navigate('Register', { userType })}
-        >
+      >
         <Text style={styles.linkText}>
-            Don't have an account? Sign up as {userType}.
+          Don't have an account? Sign up as {userType}.
         </Text>
       </TouchableOpacity>
     </View>
@@ -64,7 +102,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     width: '80%',
     alignItems: 'center',
-  },
+   },
   buttonText: {
     color: '#fff',
     fontSize: 18,
@@ -80,3 +118,4 @@ const styles = StyleSheet.create({
 });
 
 export default LoginScreen;
+

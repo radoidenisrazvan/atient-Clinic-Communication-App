@@ -5,6 +5,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import UserTypeSelectionScreen from './src/screens/UserTypeSelectionScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
+import HomeScreen from './src/screens/HomeScreen';
 
 const Stack = createStackNavigator();
 
@@ -35,6 +36,12 @@ export default function App() {
             title: `Register as ${route.params?.userType || 'User'}`,
           })} 
         />
+        <Stack.Screen 
+          name="Home" 
+          component={HomeScreen} 
+          options={{ title: 'Home' }} 
+        />
+
       </Stack.Navigator>
     </NavigationContainer>
   );
