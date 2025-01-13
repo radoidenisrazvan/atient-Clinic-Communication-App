@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { API_BASE_URL } from '../config/api'; 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginScreen = ({ route, navigation }) => {
   const userType = route?.params?.userType || 'User';
@@ -30,9 +31,17 @@ const LoginScreen = ({ route, navigation }) => {
         return;
       }
 
+      // Salvează token-ul și alte informații în AsyncStorage
+      await AsyncStorage.setItem('userToken', data.token);
+      await AsyncStorage.setItem('userType', userType || 'User');
+      await AsyncStorage.setItem('userName', data.name || 'Guest');
+
       // Navighează către Home dacă autentificarea a avut succes
       Alert.alert('Success', 'Login successful!');
-      navigation.navigate('Home', { userType: userType, name: data.name });
+      navigation.navigate('Home', {
+        userType: userType || 'User',
+        name: data.name || 'Guest',
+      });
     } catch (error) {
       console.error('Login error:', error);
       Alert.alert('Error', 'Unable to connect to the server. Please try again later.');
@@ -118,4 +127,3 @@ const styles = StyleSheet.create({
 });
 
 export default LoginScreen;
-
