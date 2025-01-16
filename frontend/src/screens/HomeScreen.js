@@ -1,17 +1,21 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { createDrawerNavigator } from '@react-navigation/drawer';
+import ProfileScreen from './ProfileScreen'; // Import the ProfileScreen component
 
-const HomeScreen = ({ route, navigation }) => {
+const Drawer = createDrawerNavigator();
+
+const Dashboard = ({ route, navigation }) => {
   const { userType = 'User', name = 'Guest' } = route.params || {};
 
   const handleLogout = async () => {
     try {
-      await AsyncStorage.clear(); // Șterge toate datele salvate în AsyncStorage
+      await AsyncStorage.clear();
       Alert.alert('Logged Out', 'You have been logged out successfully!');
       navigation.reset({
         index: 0,
-        routes: [{ name: 'UserTypeSelection' }], // Redirecționează la ecranul UserTypeSelection
+        routes: [{ name: 'UserTypeSelection' }],
       });
     } catch (error) {
       console.error('Logout error:', error);
@@ -23,11 +27,40 @@ const HomeScreen = ({ route, navigation }) => {
     <View style={styles.container}>
       <Text style={styles.welcome}>Welcome, {name}!</Text>
       <Text style={styles.info}>You are logged in as {userType}.</Text>
-
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Text style={styles.logoutButtonText}>Log Out</Text>
       </TouchableOpacity>
     </View>
+  );
+};
+
+const Settings = () => (
+  <View style={styles.container}>
+    <Text style={styles.welcome}>Settings</Text>
+    <Text style={styles.info}>Configure your application settings here.</Text>
+  </View>
+);
+
+const HomeScreen = ({ route, navigation }) => {
+  return (
+    <Drawer.Navigator initialRouteName="Dashboard">
+      <Drawer.Screen
+        name="Dashboard"
+        component={Dashboard}
+        initialParams={route.params}
+        options={{ title: 'Dashboard' }}
+      />
+      <Drawer.Screen
+        name="Profile"
+        component={ProfileScreen} 
+        options={{ title: 'Profile' }}
+      />
+      <Drawer.Screen
+        name="Settings"
+        component={Settings}
+        options={{ title: 'Settings' }}
+      />
+    </Drawer.Navigator>
   );
 };
 

@@ -7,6 +7,7 @@ import UserTypeSelectionScreen from './src/screens/UserTypeSelectionScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
 import HomeScreen from './src/screens/HomeScreen';
+import ProfileScreen from './src/screens/ProfileScreen';
 
 const Stack = createStackNavigator();
 
@@ -79,6 +80,11 @@ export default function App() {
           component={HomeScreen} 
           options={{ title: 'Home' }} 
           initialParams={userData} // Transmite datele utilizatorului
+        />
+        <Stack.Screen 
+          name="Profile" 
+          component={ProfileScreen} 
+          options={{ title: 'Profile' }} 
         />
       </Stack.Navigator>
     </NavigationContainer>

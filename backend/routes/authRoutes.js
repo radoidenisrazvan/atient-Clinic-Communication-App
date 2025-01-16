@@ -3,6 +3,7 @@ const Doctor = require("../models/userType/Doctor");
 const Patient = require("../models/userType/Patient");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const authMiddleware = require("../middleware/authMiddleware"); // Middleware pentru autentificare
 
 const router = express.Router();
 
@@ -41,7 +42,6 @@ router.post("/register", validateRegisterData, async (req, res) => {
   } = req.body;
 
   try {
-    // Verifică dacă utilizatorul există deja
     const existingUser =
       role === "doctor"
         ? await Doctor.findOne({ email })
@@ -51,7 +51,6 @@ router.post("/register", validateRegisterData, async (req, res) => {
       return res.status(400).json({ message: "User already exists." });
     }
 
-    // Hash-uiește parola
     const hashedPassword = await bcrypt.hash(password, 10);
 
     let user;
@@ -83,7 +82,6 @@ router.post("/register", validateRegisterData, async (req, res) => {
 
     await user.save();
 
-    // Generează token JWT
     const token = jwt.sign(
       { id: user._id, role: role },
       process.env.JWT_SECRET,
@@ -91,7 +89,7 @@ router.post("/register", validateRegisterData, async (req, res) => {
     );
 
     res.status(201).json({
-      message: "User registered successfully.", // Mesajul de succes
+      message: "User registered successfully.",
       id: user._id,
       role,
       name: user.name,
@@ -104,7 +102,6 @@ router.post("/register", validateRegisterData, async (req, res) => {
   }
 });
 
-
 // Logare utilizator
 router.post("/login", async (req, res) => {
   const { email, password, role } = req.body;
@@ -114,7 +111,6 @@ router.post("/login", async (req, res) => {
   }
 
   try {
-    // Caută utilizatorul în colecția corespunzătoare
     const user =
       role === "doctor"
         ? await Doctor.findOne({ email })
@@ -124,13 +120,11 @@ router.post("/login", async (req, res) => {
       return res.status(404).json({ message: "User not found." });
     }
 
-    // Verifică parola
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       return res.status(401).json({ message: "Invalid email or password." });
     }
 
-    // Generează token JWT
     const token = jwt.sign(
       { id: user._id, role: role },
       process.env.JWT_SECRET,
@@ -147,6 +141,46 @@ router.post("/login", async (req, res) => {
   } catch (error) {
     console.error("Error in /login:", error.message);
     res.status(500).json({ message: "Server error during login." });
+  }
+});
+
+// Preluarea datelor utilizatorului
+router.get("/profile", authMiddleware, async (req, res) => {
+  try {
+    const user =
+      req.user.role === "doctor"
+        ? await Doctor.findById(req.user.id)
+        : await Patient.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.error("Error fetching user profile:", error);
+    res.status(500).json({ message: "Server error." });
+  }
+});
+
+// Actualizarea datelor utilizatorului
+router.put("/profile", authMiddleware, async (req, res) => {
+  try {
+    const { name, phone } = req.body;
+
+    const user =
+      req.user.role === "doctor"
+        ? await Doctor.findByIdAndUpdate(req.user.id, { name, phone }, { new: true })
+        : await Patient.findByIdAndUpdate(req.user.id, { name, phone }, { new: true });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    res.status(200).json({ message: "Profile updated successfully.", user });
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    res.status(500).json({ message: "Server error." });
   }
 });
 
