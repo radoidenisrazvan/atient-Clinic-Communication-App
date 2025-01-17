@@ -3,7 +3,6 @@ const Doctor = require("../models/userType/Doctor");
 const Patient = require("../models/userType/Patient");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const authMiddleware = require("../middleware/authMiddleware"); // Middleware pentru autentificare
 
 const router = express.Router();
 
@@ -141,46 +140,6 @@ router.post("/login", async (req, res) => {
   } catch (error) {
     console.error("Error in /login:", error.message);
     res.status(500).json({ message: "Server error during login." });
-  }
-});
-
-// Preluarea datelor utilizatorului
-router.get("/profile", authMiddleware, async (req, res) => {
-  try {
-    const user =
-      req.user.role === "doctor"
-        ? await Doctor.findById(req.user.id)
-        : await Patient.findById(req.user.id);
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found." });
-    }
-
-    res.status(200).json(user);
-  } catch (error) {
-    console.error("Error fetching user profile:", error);
-    res.status(500).json({ message: "Server error." });
-  }
-});
-
-// Actualizarea datelor utilizatorului
-router.put("/profile", authMiddleware, async (req, res) => {
-  try {
-    const { name, phone } = req.body;
-
-    const user =
-      req.user.role === "doctor"
-        ? await Doctor.findByIdAndUpdate(req.user.id, { name, phone }, { new: true })
-        : await Patient.findByIdAndUpdate(req.user.id, { name, phone }, { new: true });
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found." });
-    }
-
-    res.status(200).json({ message: "Profile updated successfully.", user });
-  } catch (error) {
-    console.error("Error updating profile:", error);
-    res.status(500).json({ message: "Server error." });
   }
 });
 

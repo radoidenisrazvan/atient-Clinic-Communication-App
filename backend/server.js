@@ -3,6 +3,7 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const connectDB = require("./config/db"); // Importă funcția de conectare la MongoDB
 const authRoutes = require("./routes/authRoutes");
+const profileRoutes = require("./routes/profileRoutes");
 dotenv.config(); // Încarcă variabilele din fișierul .env
 
 const app = express();
@@ -13,7 +14,7 @@ app.use(cors());
 
 //Rute 
 app.use("/api/auth", authRoutes);
-app.use("/api/user", authRoutes);
+app.use("/api/user", profileRoutes);
 
 // Rute de test
 app.get("/", (req, res) => {
