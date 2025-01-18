@@ -7,8 +7,10 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  Image,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as ImagePicker from 'expo-image-picker';
 import { API_BASE_URL } from '../config/api';
 import axios from 'axios';
 
@@ -16,8 +18,9 @@ const ProfileScreen = () => {
   const [userData, setUserData] = useState({});
   const [isEditing, setIsEditing] = useState(false);
   const [userRole, setUserRole] = useState('');
+  const [profileImage, setProfileImage] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
 
-  // State-uri pentru gestionarea schimbării parolei
   const [passwordData, setPasswordData] = useState({
     password: '',
     newPassword: '',
@@ -33,6 +36,7 @@ const ProfileScreen = () => {
         });
         setUserData(response.data);
         setUserRole(response.data.role);
+        setProfileImage(response.data.imageUrl || null);
       } catch (error) {
         console.error('Error fetching user data:', error);
         Alert.alert('Error', 'Failed to fetch user data.');
@@ -54,6 +58,68 @@ const ProfileScreen = () => {
       ...prevData,
       [key]: value,
     }));
+  };
+
+  const handleImagePicker = async () => {
+    try {
+      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+      if (!permissionResult.granted) {
+        Alert.alert('Permission Required', 'Permission to access media library is required!');
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        quality: 1,
+      });
+
+      if (!result.canceled) {
+        setProfileImage(result.assets[0].uri);
+        await handleImageUpload(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error('Error opening image picker:', error);
+      Alert.alert('Error', 'Failed to open image picker.');
+    }
+  };
+
+  const handleImageUpload = async (imageUri) => {
+    setIsUploading(true);
+    try {
+      const token = await AsyncStorage.getItem('userToken');
+      const formData = new FormData();
+
+      formData.append('image', {
+        uri: imageUri,
+        type: 'image/jpeg',
+        name: 'profile.jpg',
+      });
+
+      const response = await axios.post(
+        `${API_BASE_URL}/api/user/upload-image`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      Alert.alert('Success', 'Image uploaded successfully!');
+      setProfileImage(response.data.imageUrl);
+      setUserData((prevData) => ({
+        ...prevData,
+        imageUrl: response.data.imageUrl,
+      }));
+    } catch (error) {
+      console.error('Error uploading image:', error.response?.data || error.message);
+      Alert.alert('Error', error.response?.data?.message || 'Failed to upload image.');
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const handleSave = async () => {
@@ -129,6 +195,20 @@ const ProfileScreen = () => {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Profile</Text>
+
+      <TouchableOpacity onPress={handleImagePicker}>
+        {isUploading ? (
+          <View style={styles.placeholderImage}>
+            <Text style={styles.placeholderText}>Uploading...</Text>
+          </View>
+        ) : profileImage ? (
+          <Image source={{ uri: profileImage }} style={styles.profileImage} />
+        ) : (
+          <View style={styles.placeholderImage}>
+            <Text style={styles.placeholderText}>Add Photo</Text>
+          </View>
+        )}
+      </TouchableOpacity>
 
       <TextInput
         style={styles.input}
@@ -292,6 +372,27 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#ccc',
+  },
+  profileImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    alignSelf: 'center',
+    marginBottom: 20,
+  },
+  placeholderImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: '#ccc',
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'center',
+    marginBottom: 20,
+  },
+  placeholderText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
   button: {
     backgroundColor: '#007bff',

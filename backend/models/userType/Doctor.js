@@ -8,11 +8,11 @@ const doctorSchema = mongoose.Schema(
     },
     name: {
       type: String,
-      required: true, // Numele
+      required: true,
     },
     surname: {
       type: String,
-      required: true, // Prenumele
+      required: true, 
     },
     email: {
       type: String,
@@ -39,9 +39,13 @@ const doctorSchema = mongoose.Schema(
       type: String,
       required: true,
     },
+    imageUrl: {
+      type: String,
+      default: null 
+    },
   },
   {
-    timestamps: true, // Adaugă automat createdAt și updatedAt
+    timestamps: true,
   }
 );
 
