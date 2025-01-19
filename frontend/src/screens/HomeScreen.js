@@ -112,6 +112,14 @@ const HomeScreen = ({ route, navigation }) => {
     }, [])
   );
 
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('state', () => {
+      fetchUserProfile();
+    });
+
+    return unsubscribe;
+  }, [navigation]);
+
   const handleLogout = async () => {
     try {
       await AsyncStorage.clear();
