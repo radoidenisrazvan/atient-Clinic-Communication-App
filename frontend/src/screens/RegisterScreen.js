@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: 20,
-    paddingBottom: 80, // Spațiu suplimentar pentru a evita suprapunerea cu butonul
+    paddingBottom: 80, 
   },
   title: {
     fontSize: 28,

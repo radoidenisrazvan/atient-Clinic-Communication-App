@@ -22,7 +22,6 @@ const RegisterPatientForm = ({ navigation }) => {
 
   const handleInputChange = (key, value) => {
     if (key === 'birthDate') {
-      // Permite doar cifre și caractere `.`
       value = value.replace(/[^0-9.]/g, '');
     }
     setFormData((prevData) => ({
@@ -33,11 +32,9 @@ const RegisterPatientForm = ({ navigation }) => {
 
   const handleSubmit = async () => {
     try {
-      // Convertește data din formatul DD.MM.YYYY în formatul acceptat de MongoDB
       const [day, month, year] = formData.birthDate.split('.');
       const formattedDate = new Date(`${year}-${month}-${day}`);
 
-      // Verifică dacă data este validă
       if (isNaN(formattedDate.getTime())) {
         Alert.alert('Error', 'Invalid Date of Birth. Please use the format DD.MM.YYYY');
         return;
@@ -46,7 +43,7 @@ const RegisterPatientForm = ({ navigation }) => {
       const dataToSend = {
         ...formData,
         role: 'patient',
-        birthDate: formattedDate, // Trimite data formatată
+        birthDate: formattedDate, 
       };
 
       const response = await axios.post(`${API_BASE_URL}/api/auth/register`, dataToSend);

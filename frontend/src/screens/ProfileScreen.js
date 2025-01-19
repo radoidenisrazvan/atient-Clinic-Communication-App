@@ -13,8 +13,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
 import { API_BASE_URL } from '../config/api';
 import axios from 'axios';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
 const ProfileScreen = () => {
+  const navigation = useNavigation();
+  const route = useRoute();
   const [userData, setUserData] = useState({});
   const [isEditing, setIsEditing] = useState(false);
   const [userRole, setUserRole] = useState('');
@@ -90,7 +93,6 @@ const ProfileScreen = () => {
     try {
       const token = await AsyncStorage.getItem('userToken');
       const formData = new FormData();
-
       formData.append('image', {
         uri: imageUri,
         type: 'image/jpeg',

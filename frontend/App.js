@@ -50,7 +50,6 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <StatusBar style="auto" />
       <Stack.Navigator initialRouteName={isLoggedIn ? 'Home' : 'UserTypeSelection'}>
         {/* Select User Type Screen */}
         <Stack.Screen 
@@ -78,8 +77,8 @@ export default function App() {
         <Stack.Screen 
           name="Home" 
           component={HomeScreen} 
-          options={{ title: 'Home' }} 
-          initialParams={userData} // Transmite datele utilizatorului
+          options={{ headerShown: false }}
+          initialParams={userData} 
         />
         <Stack.Screen 
           name="Profile" 

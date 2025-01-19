@@ -31,10 +31,7 @@ const RegisterDoctorForm = ({ navigation }) => {
     }
     try {
       const dataToSend = { ...formData, role: "doctor" };
-  
-      // console.log("Submitting data:", dataToSend); // Log pentru verificare
       const response = await axios.post(`${API_BASE_URL}/api/auth/register`, dataToSend);
-      // console.log("Response received:", response.data);
       Alert.alert("Success", response.data.message || "User registered successfully");
       navigation.navigate('Login', { userType: 'Doctor' });
     } catch (error) {
